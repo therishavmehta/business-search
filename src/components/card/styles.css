@@ -1,0 +1,36 @@
+.card {
+  width: 150px;
+  margin: 10px;
+  border-radius: 8px;
+  background-color: white;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+ }
+ 
+ .card:hover {
+   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+   cursor: pointer;
+ }
+ 
+ .card-image {
+   height: 190px;
+   width: 100%;
+ }
+ 
+ .card-image img {
+   height: 100%;
+   width: 100%;
+ }
+ 
+ .card-name {
+   width: 250px;
+   padding: 0 10px;
+   font-size: 14px;
+   color: #343434;
+   font-weight: 700;
+   overflow: visible;
+   display: flex;
+   justify-content: center;
+ }
+ 

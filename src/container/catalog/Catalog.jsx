@@ -1,8 +1,7 @@
 import { React, useLayoutEffect, useState } from 'react';
-import { ContentCard, Spinner } from '../../components';
-
-import { connect } from 'react-redux';
-import { appendItem, addItem, intialiseData } from '../../redux/anime/anime.actions';
+import { Card, Spinner } from '../../components';
+//import { connect } from 'react-redux';
+// import { appendItem, addItem, intialiseData } from '../../redux/anime/anime.actions';
 
 import './styles.css';
 
@@ -22,12 +21,13 @@ function Catalog(props) {
     const [ lastPage, setLastPage ] = useState(0);
 
     useLayoutEffect(() => {
-        (function() {
-            if (queries.text.length) {
-                getCards();
-            }
-        })();
-    }, [queries.page, queries.text, uri, topic]);
+        //(function() {
+        //    if (queries.text.length) {
+        //        getCards();
+        //    }
+        //})();
+        // queries.page, queries.text, uri, topic
+    }, []);
 
     /**
      *
@@ -54,13 +54,13 @@ function Catalog(props) {
      * append cards
      */
     const getCards = async () => {
-        const { results, last_page } = await getData(queries);
-        if(lastPage !== last_page) {
-            setLastPage(last_page);
-        }
-        if(results.length) {
-            results.length && appendData(results);
-        }
+        //const { results, last_page } = await getData(queries);
+        //if(lastPage !== last_page) {
+        //    setLastPage(last_page);
+        //}
+        //if(results.length) {
+        //    results.length && appendData(results);
+        //}
     }
 
     /**
@@ -69,19 +69,19 @@ function Catalog(props) {
      * create react node and saves it in the state
      */
     const getCardInstance = (list=[]) => {
-        const cards = [];
-        list.length && list.forEach((anime) => {
-            const {mal_id, ...otherProps} = anime;
-            cards.push(<ContentCard key={mal_id} {...otherProps}/>)
-        });
-        return cards;
+        //const cards = [];
+        //list.length && list.forEach((anime) => {
+        //    const {mal_id, ...otherProps} = anime;
+        //    cards.push(<Card key={mal_id} {...otherProps}/>)
+        //});
+        //return cards;
     }
 
     /**
      * update query with page
      */
     const loadMore = () => {
-        setQueries(({page=1, ...otherProps}) => ({page: page+1, ...otherProps}));
+        //setQueries(({page=1, ...otherProps}) => ({page: page+1, ...otherProps}));
     }
 
     /**
@@ -90,8 +90,8 @@ function Catalog(props) {
      * sets input value
      */
     const handleInputValue = (event) => {
-        event.preventDefault();
-        setInputValue(event.target.value);
+        //event.preventDefault();
+        //setInputValue(event.target.value);
     }
 
     /**
@@ -100,9 +100,9 @@ function Catalog(props) {
      * trigger data fetch when enter is captured in input
      */
     const triggerEvent = (event) => {
-        if (event.key === 'Enter') {
-            getNewData(event);
-        }
+        //if (event.key === 'Enter') {
+        //    getNewData(event);
+        //}
     }
 
     /**
@@ -111,28 +111,28 @@ function Catalog(props) {
      * trigger the new data fetch and update the steps
      */
     const getNewData = async (event) => {
-        event.preventDefault();
-        if(inputValue.length < 3) {
-            alert("Error: Requires atleast 3 or more characters");
-            return;
-        } else if (queries.text !== inputValue) {
-            intialiseData();
-            setQueries(({ text, page, ...otherProps }) => ({ text: inputValue, page: 1, ...otherProps }));
-        }
+        //event.preventDefault();
+        //if(inputValue.length < 3) {
+        //    alert("Error: Requires atleast 3 or more characters");
+        //    return;
+        //} else if (queries.text !== inputValue) {
+        //    intialiseData();
+        //    setQueries(({ text, page, ...otherProps }) => ({ text: inputValue, page: 1, ...otherProps }));
+        //}
     }
 
     /**
      * condition for render loading more
      */
     const shouldLoadMore = () => {
-        return lastPage !== queries.page && !isLoadingMore && anime.length;
+        //return lastPage !== queries.page && !isLoadingMore && anime.length;
     }
 
     return (
         <div className="catalog-container">
             <div className="search-box">
                 <input id="search-query" name="text" type="text" value={inputValue}
-                    placeholder="search for an anime, e.g. Deathnote" autoComplete="off"
+                    placeholder="search for a bussines e.g- restraunts" autoComplete="off"
                     onChange={(event) => handleInputValue(event)} onKeyDown={event => triggerEvent(event)}/>
                 <button className="search-button" onClick={(event) => getNewData(event)}>Go</button>
             </div>
@@ -149,14 +149,14 @@ function Catalog(props) {
     )
 }
 
-const mapStateToProps = state => ({
-    anime: state.animeReducer.currentAnime
-});
+//const mapStateToProps = state => ({
+//    anime: state.animeReducer.currentAnime
+//});
 
-const mapDispatchToProps = dispatch => ({
-    setNewData: anime => dispatch(addItem(anime)),
-    appendData: anime => dispatch(appendItem(anime)),
-    intialiseData: anime => dispatch(intialiseData())
-})
+//const mapDispatchToProps = dispatch => ({
+//    setNewData: anime => dispatch(addItem(anime)),
+//    appendData: anime => dispatch(appendItem(anime)),
+//    intialiseData: anime => dispatch(intialiseData())
+//})
 
-export default connect(mapStateToProps, mapDispatchToProps)(Catalog);
+export default Catalog;
