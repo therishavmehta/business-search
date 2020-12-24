@@ -1,7 +1,9 @@
 import Card from './card';
-import Spinner from './spinner'
+import Spinner from './spinner';
+import Search from './search';
 
 export {
     Card,
-    Spinner
+    Spinner,
+    Search
 };

@@ -1,21 +1,22 @@
 import { React, useLayoutEffect, useState } from 'react';
-import { Card, Spinner } from '../../components';
+import { Card, Spinner, Search } from '../../components';
 //import { connect } from 'react-redux';
 // import { appendItem, addItem, intialiseData } from '../../redux/anime/anime.actions';
-
+import {sample} from '../../data';
 import './styles.css';
 
 /**
  * Prepares the catlog of anime category
  */
 function Catalog(props) {
+    console.log(sample);
     const { uri, topic, anime, appendData, intialiseData } = props;
     const [queries, setQueries] = useState({
         text: '',
         limit: 16,
         page: 1,
     });
-    const [inputValue, setInputValue] = useState('');
+    
     const [isLoadingMore, setLoadingMore] = useState(false);
     const [api, setApi] = useState('');
     const [ lastPage, setLastPage ] = useState(0);
@@ -69,12 +70,12 @@ function Catalog(props) {
      * create react node and saves it in the state
      */
     const getCardInstance = (list=[]) => {
-        //const cards = [];
-        //list.length && list.forEach((anime) => {
-        //    const {mal_id, ...otherProps} = anime;
-        //    cards.push(<Card key={mal_id} {...otherProps}/>)
-        //});
-        //return cards;
+        const cards = [];
+        list.length && list.forEach((bussines) => {
+            const {id, ...otherProps} = bussines;
+            cards.push(<Card key={id} {...otherProps}/>)
+        });
+        return cards;
     }
 
     /**
@@ -82,43 +83,6 @@ function Catalog(props) {
      */
     const loadMore = () => {
         //setQueries(({page=1, ...otherProps}) => ({page: page+1, ...otherProps}));
-    }
-
-    /**
-     *
-     * @param {Object} event - event object
-     * sets input value
-     */
-    const handleInputValue = (event) => {
-        //event.preventDefault();
-        //setInputValue(event.target.value);
-    }
-
-    /**
-     *
-     * @param {Object} event - event object
-     * trigger data fetch when enter is captured in input
-     */
-    const triggerEvent = (event) => {
-        //if (event.key === 'Enter') {
-        //    getNewData(event);
-        //}
-    }
-
-    /**
-     *
-     * @param {Object} event - event object
-     * trigger the new data fetch and update the steps
-     */
-    const getNewData = async (event) => {
-        //event.preventDefault();
-        //if(inputValue.length < 3) {
-        //    alert("Error: Requires atleast 3 or more characters");
-        //    return;
-        //} else if (queries.text !== inputValue) {
-        //    intialiseData();
-        //    setQueries(({ text, page, ...otherProps }) => ({ text: inputValue, page: 1, ...otherProps }));
-        //}
     }
 
     /**
@@ -130,18 +94,13 @@ function Catalog(props) {
 
     return (
         <div className="catalog-container">
-            <div className="search-box">
-                <input id="search-query" name="text" type="text" value={inputValue}
-                    placeholder="search for a bussines e.g- restraunts" autoComplete="off"
-                    onChange={(event) => handleInputValue(event)} onKeyDown={event => triggerEvent(event)}/>
-                <button className="search-button" onClick={(event) => getNewData(event)}>Go</button>
-            </div>
+            <Search />
             <div style={{alignSelf: 'left'}}>
                 <span className="requesting">Requesting: </span>
                 <span className="api-text">{api || 'API Request URL will appear here'}</span>
             </div>
-            <div className="card-content">
-                {getCardInstance(anime)}
+            <div className="card-content" onClick={(event) => console.log(event)}>
+                {getCardInstance(sample.businesses)}
             </div>
             {isLoadingMore && <Spinner />}
             {shouldLoadMore() ? <a className="loadMore" onClick={loadMore}>Load more...</a> : null}
