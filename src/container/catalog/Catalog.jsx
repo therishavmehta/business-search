@@ -1,5 +1,5 @@
 import { React, useLayoutEffect, useState } from 'react';
-import { Card, Spinner, Search } from '../../components';
+import { Card, Spinner, Search, Map } from '../../components';
 //import { connect } from 'react-redux';
 // import { appendItem, addItem, intialiseData } from '../../redux/anime/anime.actions';
 import {sample} from '../../data';
@@ -95,6 +95,12 @@ function Catalog(props) {
     return (
         <div className="catalog-container">
             <Search />
+            {/*<Map
+
+                center={{lat: 18.5204, lng: 73.8567}}
+                height='300px'
+                zoom={15}
+            />*/}
             <div style={{alignSelf: 'left'}}>
                 <span className="requesting">Requesting: </span>
                 <span className="api-text">{api || 'API Request URL will appear here'}</span>
