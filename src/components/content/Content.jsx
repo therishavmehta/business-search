@@ -1,26 +1,58 @@
-import {React} from 'react';
+import {React, Suspense, useEffect, useState} from 'react';
 //import openLink from '../../../public/open-link.png';
 //<img src={openLink} onClick={() => openNewTab(url)}/>
 import './styles.css';
-
+import {Tag, Modal, Spinner, Map} from '../../components';
+import axios from 'axios';
+import {withRouter} from 'react-router';
+import {Icon} from 'semantic-ui-react'
 function Content(props) {
-  const {name='', image_url='', categories=[], review_count=0, display_phone=0, url='',
-    is_claimed=false, is_closed=true, rating=0, location={}, coordinates={}, photos='', hours=[], phone=0
-    , alias, special_hours, price} = props;
-
+    const { token='', match:{params: {busid}={}}={}, mapToken=''} = props;
+    const [data, setData] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [mapViewPort, setMapViewPort] = useState({
+      latitude: 25.0960742,
+      longitude: 85.31311939999999,
+      heigth: '100vh',
+      width: '100vw',
+      zoom: 10
+    })
     const openNewTab = (link) => {
       window.open(link, '_blank');
     }
 
-    const bussinesPhotos = (photos) => {
+    useEffect(() => {
+      (function() {
+        setLoading(true);
+        axios.get(`${'https://cors-anywhere.herokuapp.com/'}https://api.yelp.com/v3/businesses/${busid}`, {
+           headers: {
+            Authorization: `Bearer ${token}`
+            }
+        })
+          .then((res) => {
+            setData(res.data);
+          })
+          .catch((err) => {
+          console.log ('error')
+          }).finally(() => setLoading(false));
+      })();
+
+    }, []);
+
+    const {name='', image_url='', categories=[], review_count=0, display_phone=0, url='',
+    is_claimed=false, is_closed=true, rating=0, location: {address1='', address2='', address3='', 
+    city='', state='', country='', zip_code=0}={}, coordinates={}, photos='', hours=[], phone=0
+    , alias, special_hours, price} = data;
+
+    const bussinesPhotos = (photos=[]) => {
       let node = [];
-      photos.forEach((item) => {
+      photos && photos.forEach((item) => {
         node.push(<img style={{height: '200px', width: '200px'}} src={item} alt={'No Avatar'} />)
       });
       return node;
     }
 
-    const timing = (times) => {
+    const timing = (times=[]) => {
       const node = [];
       const arr = times.filter(time => time["open"]);
       arr.length && arr[0].open.forEach(item => {
@@ -37,17 +69,17 @@ function Content(props) {
       return node;
     }
 
-    const getTags = (categories) => {
+    const getTags = (categories=[]) => {
       let node = [];
-      categories.forEach(category => {
-        node.push(<span className="tag-name">{category.title}</span>);
+      categories && categories.forEach(category => {
+        node.push(<Tag>{category.title}</Tag>);
       });
       return node;
     }
 
-    const specialHours = (special) => {
+    const specialHours = (special=[]) => {
       let node = [];
-      special.forEach((item) => {
+      special && special.forEach((item) => {
         const {is_overnight, start, end, date, is_closed} = item;
         node.push(<div key={date} style={{textAlign: 'left'}} className="special-hours">
                     <h3>{date}</h3>
@@ -60,12 +92,13 @@ function Content(props) {
       return node;
     }
     return (
-      <>
         <div className="row">
+                {loading ? 
+          <Spinner /> :
           <div className="leftcolumn">
             <div className="container-header">
               <div >
-                <img style={{height: '300px', width: '250px'}} src={image_url} alt="No Avatar" />
+                <img style={{height: '300px', width: '250px'}} src={image_url} alt={alias} />
               </div>
               <div className="container">
                 <div className="title-container" >
@@ -75,16 +108,16 @@ function Content(props) {
                 <div>
                   <h3>{`${is_claimed ? 'Claimed': 'Not Claimed'}`}</h3>
                 </div>
-                <h3>Rating: {rating}/5</h3>
+                  <h3>Rating: {rating}/5     {`(${review_count})`}</h3>
                 <h3>Price: {price}</h3>
                 <h3 >Phone: <a className="text" href={`tel:${phone}`}>{display_phone}</a></h3>
             </div>
           </div>
-          <div className="timing-container">
-            <h2>{photos.length ? 'Photos': ''}</h2>
+          <h2>{photos.length ? 'Photos': ''}</h2>
             <div className="bussines-photos">
               {bussinesPhotos(photos)}
             </div>
+          <div className="timing-container">
             <div class="hours-container">
                 <h2>Timing</h2>
                     <div className="heading-table">
@@ -107,30 +140,28 @@ function Content(props) {
                     {specialHours(special_hours)}
               </div>
             </div>
-          </div>
-          <div className="rightcolumn">
-            <div className="container">
-              <h2>About Me</h2>
-              <div className="img" style={{height: '100px'}}>Image</div>
-              <p>Some text about me in culpa qui officia deserunt mollit anim..</p>
+            <div className="address">
+              <h2>Address</h2>
+            <div style={{display: 'flex', flexDirection: 'column'}}>
+              <div>
+                <div style={{textAlign: 'center', maxWidth: '200px'}}>
+                  <h4>{`${address1},  ${address2}`}</h4>
+                  <h4>{`${city},  ${state},`}</h4>
+                  <h4>{`${country}-${zip_code}`}</h4>
+                </div>
+                <div style={{height: '400px', width: '500px'}}>
+                  <Map region={coordinates} coordinates={[coordinates]}/>
+                </div>
+                </div>
+              </div>
             </div>
-            <div className="container">
-              <h3>Popular Post</h3>
-              <div className="img">Image</div><br />
-              <div className="img">Image</div><br />
-              <div className="img">Image</div>
-            </div>
-            <div className="container">
-              <h3>Follow Me</h3>
-              <p>Some text..</p>
-            </div>
-          </div>
+          </div>}
         </div>
-      </>
+
     );
 }
 
-export default Content;
+export default withRouter(Content);
 
 Content.DAYS = [
   'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'

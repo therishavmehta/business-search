@@ -1,4 +1,5 @@
 import { React, useState } from 'react';
+import {Modal, Filter} from '../../components';
 import './styles.css';
 
 function Search(props) {
@@ -11,6 +12,7 @@ function Search(props) {
   });
   const [formError, setformError] = useState(false);
   const [toggleLocation, setLocation] = useState(true);
+  const [filterModal, setFilterModal] = useState(false);
 
   /**
      *
@@ -48,7 +50,7 @@ function Search(props) {
       encoded += toggleLocation ? `location=${address}` : `latitude=${latitude}&longitude=${longitude}`; 
       if(error.length > 17) setformError(error) 
       else {
-        console.log(encodeURI(`term=${bussines}&location=${address}`));
+        triggerApi(encodeURI(`term=${bussines}&location=${address}`));
         setformError('');
       }
   }
@@ -73,6 +75,10 @@ function Search(props) {
     </>
   )
 
+  const handleModalClose = () => {
+    setFilterModal(false);
+  }
+
 
 
   return (
@@ -83,13 +89,17 @@ function Search(props) {
               onChange={(event) => handleInputChange(Search.INPUT.BUSSINES, event)} onKeyDown={event => triggerEvent(event)}/>
               {toggleLocation ? location : coordinate}
         </div>
-        <div style={{marginTop: '5px'}}>
+        <div style={{marginTop: '5px', marginLeft: '5px'}}>
           <button className="search-button" onClick={(event) => checkDataAndTrigger(event)}>Go</button>
+          <button className="search-button" onClick={() => setFilterModal(true)}>Filter</button>
         </div>
         <span className="toggle-button" onClick={() => setLocation(!toggleLocation)}>
               Switch to {toggleLocation ? 'Co-ordinate' : 'Location'}
         </span>
         {formError && <span style={{color: 'red'}}>{formError}</span>}
+        { filterModal && <Modal handleClose={handleModalClose} show={filterModal}>
+          <Filter />
+        </Modal>}
     </div>
   );
 }

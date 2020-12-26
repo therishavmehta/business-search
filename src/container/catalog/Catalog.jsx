@@ -1,54 +1,115 @@
-import { React, useLayoutEffect, useState } from 'react';
-import { Card, Spinner, Search, Map } from '../../components';
+import { React, useEffect, useState } from 'react';
+import { Card, Spinner, Search, Map, Snackbar } from '../../components';
+import {Link} from 'react-router-dom';
 //import { connect } from 'react-redux';
 // import { appendItem, addItem, intialiseData } from '../../redux/anime/anime.actions';
-import {sample} from '../../data';
 import './styles.css';
+import { geolocated } from "react-geolocated";
+import axios from 'axios';
 
 /**
  * Prepares the catlog of anime category
  */
 function Catalog(props) {
-    console.log(sample);
-    const { uri, topic, anime, appendData, intialiseData } = props;
+    const { url, coords, isGeolocationEnabled, isGeolocationAvailable } = props;
     const [queries, setQueries] = useState({
         text: '',
-        limit: 16,
-        page: 1,
+        limit: 20,
+        totalPage: 1,
+        page: 1
     });
     
     const [isLoadingMore, setLoadingMore] = useState(false);
     const [api, setApi] = useState('');
-    const [ lastPage, setLastPage ] = useState(0);
+    const [data, setData] = useState([]);
+    const [param, setParam] = useState('');
+    const [filters, setFilters] = useState('');
+    const [snackData, setSnackData] = useState(false);
+    const [markers, setMarkers] = useState([]);
+    const [region, setRegion] = useState({});
 
-    useLayoutEffect(() => {
-        //(function() {
-        //    if (queries.text.length) {
-        //        getCards();
-        //    }
-        //})();
-        // queries.page, queries.text, uri, topic
-    }, []);
+    useEffect(() => {
+        api.length && getData();
+        console.log(coords, isGeolocationAvailable, isGeolocationEnabled);
+    }, [api]);
+
+
+    const filterApi = (param, query) => {
+            const {token} = props;
+            setLoadingMore(() => true);
+            axios.get(`${'https://cors-anywhere.herokuapp.com/'}https://api.yelp.com/v3/businesses/search?${query}`, {
+           headers: {
+            Authorization: `Bearer ${token}`
+            }
+        })
+          .then((res) => {
+            console.log(res.data);
+            setData([...data, res.data.businesses]);
+            const totalPage = res.data.total/queries.limit;
+            setQueries({...queries, totalPage});
+          })
+          .catch((err) => {
+          console.log (err);
+          }).finally(() => {
+              setLoadingMore(() => false);
+          })
+    }
+
+    const newSearch = (query) => {
+        if(queries.text !== query) {
+            setQueries({text: query, page:1, ...queries});
+            setApi(url+query);
+        }
+    }
+
+    const applyFilter =(query) => {
+        if(filters !== query) {
+            setQueries({page: 1, ...queries});
+            setFilters(query)
+            setApi(api+query);
+       }
+    }
+
+    const getMarkers = (items) => {
+        let node = [];
+        items.forEach((item) => {
+            node.push(item);
+        });
+        setMarkers([...markers, node]);
+    }
 
     /**
      *
      * @param {Object} queries - get data for the queries.
      */
-    const getData = async (queries) => {
-        const {text='', limit, page=1 } = queries;
-        try {
+    const getData = () => {
+        const {token} = props;
             setLoadingMore(() => true);
-            const notSensitiveText = text.toLowerCase();
-            const query = `${uri}/search/${topic}?q=${notSensitiveText}&limit=${limit}&page=${page}`;
-            setApi(() => (`${uri}/search/${topic}?q=${notSensitiveText}`));
-            const getResponse = await fetch(query);
-            const response = await getResponse.json();
-            return response;
-        } catch(error) {
-            throw error;
-        } finally {
-            setLoadingMore(false);
-        }
+            axios.get(api, {
+           headers: {
+            Authorization: `Bearer ${token}`
+            }
+        })
+          .then((res) => {
+            setData([...data, ...res.data.businesses]);
+            const totalPage = res.data.total/queries.limit;
+            queries.totalPage !== totalPage && setQueries({...queries, totalPage});
+          })
+          .catch((err) => {
+          console.log (err);
+          setSnackData('Something went wrong!');
+          }).finally(() => {
+              setLoadingMore(() => false);
+              setTimeout(setSnackData(false), 0);
+
+          })
+            //const notSensitiveText = text.toLowerCase();
+            //const query = `${uri}/search/${topic}?q=${notSensitiveText}&limit=${limit}&page=${page}`;
+            //setApi(() => (`${uri}/search/${topic}?q=${notSensitiveText}`));
+            //const getResponse = await fetch(query);
+            //const response = await getResponse.json();
+            ////prepareFilter(response);
+            //return response;x`
     }
 
     /**
@@ -71,9 +132,12 @@ function Catalog(props) {
      */
     const getCardInstance = (list=[]) => {
         const cards = [];
-        list.length && list.forEach((bussines) => {
+        list.length && list.forEach((bussines={}) => {
             const {id, ...otherProps} = bussines;
-            cards.push(<Card key={id} {...otherProps}/>)
+            cards.push(
+                <Link to={`/bussines/${id}`} params={id}>
+            <Card id={id} key={id} {...otherProps}/>
+            </Link>);
         });
         return cards;
     }
@@ -82,34 +146,31 @@ function Catalog(props) {
      * update query with page
      */
     const loadMore = () => {
-        //setQueries(({page=1, ...otherProps}) => ({page: page+1, ...otherProps}));
+        const reg = /offset=[1-9]+/gi;
+        const pageq = `offset=${queries.limit*queries.page}`
+        setQueries(({page=1, ...otherProps}) => ({page: page+1, ...otherProps}));
+        reg.test(api) ? setApi(api.replace(reg, pageq)) : setApi(api+`limit:${queries.limit}&${pageq}`);
+
     }
 
     /**
      * condition for render loading more
      */
     const shouldLoadMore = () => {
-        //return lastPage !== queries.page && !isLoadingMore && anime.length;
+        return queries.totalPage !== queries.page && !isLoadingMore && api.length;
     }
+
+    const redirectPage = (event) => {};
 
     return (
         <div className="catalog-container">
-            <Search />
-            {/*<Map
-
-                center={{lat: 18.5204, lng: 73.8567}}
-                height='300px'
-                zoom={15}
-            />*/}
-            <div style={{alignSelf: 'left'}}>
-                <span className="requesting">Requesting: </span>
-                <span className="api-text">{api || 'API Request URL will appear here'}</span>
+            <Search style={{display: 'block', transition: 'top 0.3s'}} triggerApi={newSearch}/>
+            <div className="card-content">
+                {getCardInstance(data)}
             </div>
-            <div className="card-content" onClick={(event) => console.log(event)}>
-                {getCardInstance(sample.businesses)}
-            </div>
-            {isLoadingMore && <Spinner />}
+            {isLoadingMore && api.length && <Spinner />}
             {shouldLoadMore() ? <a className="loadMore" onClick={loadMore}>Load more...</a> : null}
+            {snackData && <Snackbar text={snackData}/>}
         </div>
     )
 }
@@ -124,4 +185,49 @@ function Catalog(props) {
 //    intialiseData: anime => dispatch(intialiseData())
 //})
 
-export default Catalog;
+export default geolocated({
+    positionOptions: {
+        enableHighAccuracy: false,
+    },
+    userDecisionTimeout: 5000,
+})(Catalog);
+
+Catalog.filters = ["categories", "price", "is_claimed", "is_closed"]
+
+/** Use for prepared data
+ * const prepareFilter = (datas) => {
+        let filterData = new Map();
+        datas.forEach((data, idx) => {
+            Catalog.filters.forEach((item) => {
+                if(data.hasOwnProperty(item)) {
+                    let prevItems, newData;
+                    if(typeof data[item] === 'string') {
+                      prevItems = filterData.get(item) || {};
+                      newData = Object.keys(prevItems).includes(data[item]) ? 
+                                [...prevItems[data[item]], idx] : [idx];
+                      prevItems[data[item]] = newData;
+                      filterData.set(item, prevItems);
+                    } else if(Array.isArray(data[item]) && item === 'categories') {
+                        data[item].forEach((category) => {
+                           const {alias, title} = category;
+                           prevItems = filterData.get(item) || {};
+                           newData = Object.keys(prevItems).includes(title) ?
+                                      [...prevItems[title], idx] : [idx];
+                           prevItems[title] = newData;
+                           filterData.set(item, prevItems); 
+                        })
+                                    
+                    } else if(typeof data[item] === 'boolean') {
+                        prevItems = filterData.get(item) || {};
+                        const values = data[item] ? item.substring(3) : 'Not '+item.substring(3);
+                        newData = Object.keys(prevItems).includes(values) ?
+                                    [...prevItems[values], idx] : [idx];
+                        prevItems[values] = newData;
+                        filterData.set(item, prevItems);
+                    }                                      
+                }
+            });
+        });
+        return filterData;
+    }
+ */
