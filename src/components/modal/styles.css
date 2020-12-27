@@ -1,0 +1,21 @@
+
+.modal {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.modal-container {
+  position: absolute;
+  width: 60%;
+  background: #ffffff;
+  color: black;
+  left: 25%;
+  top: 30%;
+  padding: 20px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+}

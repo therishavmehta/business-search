@@ -19,6 +19,20 @@
   justify-items: center;
 }
 
+.navbar {
+  margin: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  position: sticky;
+  background-color: #1B7AC2;
+  justify-content: center;
+  top: 0;
+  transition: top 0.6s;
+}
+
 .loadMore {
   width: 200px;
   color: #fff;

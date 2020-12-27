@@ -1,67 +1,68 @@
-import { React, useLayoutEffect, useState } from 'react';
-import { Card, Spinner, Search } from '../../components';
-//import { connect } from 'react-redux';
-// import { appendItem, addItem, intialiseData } from '../../redux/anime/anime.actions';
-import {sample} from '../../data';
+import { React, useState } from 'react';
+import { Card, Spinner, Search, Map, Snackbar, Modal } from '../../components';
+import {Link} from 'react-router-dom';
 import './styles.css';
+import axios from 'axios';
 
 /**
  * Prepares the catlog of anime category
  */
 function Catalog(props) {
-    console.log(sample);
-    const { uri, topic, anime, appendData, intialiseData } = props;
-    const [queries, setQueries] = useState({
-        text: '',
-        limit: 16,
-        page: 1,
-    });
+    const { url, token,
+            data=[], setRenderData,
+            markers, setMarkers,
+            region, setRegion,
+            queries, setQueries,
+            isLoadingMore, setLoadingMore } = props;
     
-    const [isLoadingMore, setLoadingMore] = useState(false);
-    const [api, setApi] = useState('');
-    const [ lastPage, setLastPage ] = useState(0);
+    const [snackData, setSnackData] = useState(false);
+    const [mapView, setMapView] = useState(false);
 
-    useLayoutEffect(() => {
-        //(function() {
-        //    if (queries.text.length) {
-        //        getCards();
-        //    }
-        //})();
-        // queries.page, queries.text, uri, topic
-    }, []);
 
+    const newSearch = (query) => {
+        if(queries.text !== query) {
+            setData(query, '', false);
+        }
+    }
     /**
      *
      * @param {Object} queries - get data for the queries.
      */
-    const getData = async (queries) => {
-        const {text='', limit, page=1 } = queries;
-        try {
+    const setData = (query, pagination, offset=false) => {
             setLoadingMore(() => true);
-            const notSensitiveText = text.toLowerCase();
-            const query = `${uri}/search/${topic}?q=${notSensitiveText}&limit=${limit}&page=${page}`;
-            setApi(() => (`${uri}/search/${topic}?q=${notSensitiveText}`));
-            const getResponse = await fetch(query);
-            const response = await getResponse.json();
-            return response;
-        } catch(error) {
-            throw error;
-        } finally {
-            setLoadingMore(false);
-        }
+            axios.get(url+query+pagination, {
+           headers: {
+            Authorization: `Bearer ${token}`
+            }
+        })
+          .then((res) => {
+            if(offset) {
+                setRenderData([...data, ...res.data.businesses]);
+                setMarkers([...markers, ...appendMarkers(res.data.businesses)]);
+            } else {
+                setRenderData([...res.data.businesses]);
+                setMarkers([...appendMarkers(res.data.businesses)]);
+            }
+            const totalPage = Math.ceil(res.data.total/queries.limit);
+            setQueries({...queries, text: query, page:1, totalPage});
+            res.data.region.center && setRegion(res.data.region.center);
+          })
+          .catch((err) => {
+            console.error (err);
+            setSnackData('Something went wrong!');
+          }).finally(() => {
+              setLoadingMore(() => false);
+              setTimeout(setSnackData(false), 5000);
+
+          })
     }
 
-    /**
-     * append cards
-     */
-    const getCards = async () => {
-        //const { results, last_page } = await getData(queries);
-        //if(lastPage !== last_page) {
-        //    setLastPage(last_page);
-        //}
-        //if(results.length) {
-        //    results.length && appendData(results);
-        //}
+    const appendMarkers = (datas) => {
+        let nodes = [];
+        datas.forEach((data) => {
+            data["coordinates"] && nodes.push(data["coordinates"])
+        });
+        return nodes;
     }
 
     /**
@@ -71,10 +72,14 @@ function Catalog(props) {
      */
     const getCardInstance = (list=[]) => {
         const cards = [];
-        list.length && list.forEach((bussines) => {
+        list.length && list.forEach((bussines={}) => {
             const {id, ...otherProps} = bussines;
-            cards.push(<Card key={id} {...otherProps}/>)
+            cards.push(
+                <Link to={`/bussines/${id}`} params={id}>
+            <Card id={id} key={id} {...otherProps}/>
+            </Link>);
         });
+
         return cards;
     }
 
@@ -82,40 +87,42 @@ function Catalog(props) {
      * update query with page
      */
     const loadMore = () => {
-        //setQueries(({page=1, ...otherProps}) => ({page: page+1, ...otherProps}));
+        const reg = /&offset=[1-9]+/gi;
+        const pageq = `&offset=${queries.limit*(queries.page+1)}`
+        reg.test(queries.text) ? setData(queries.text, queries.text.replace(reg, pageq), true) : 
+        setData(queries.text, `&limit:${queries.limit}${pageq}`, true);
+        setQueries(({...queries ,page: queries.page+1}));
     }
 
     /**
      * condition for render loading more
      */
     const shouldLoadMore = () => {
-        //return lastPage !== queries.page && !isLoadingMore && anime.length;
+        return queries.totalPage !== queries.page && !isLoadingMore;
     }
+
+    const renderMap = () => {
+        return (
+            <Modal handleClose={() => setMapView(false)} show={mapView}>
+                <Map region={region} coordinates={markers} />
+            </Modal>
+        )
+    }
+
 
     return (
         <div className="catalog-container">
-            <Search />
-            <div style={{alignSelf: 'left'}}>
-                <span className="requesting">Requesting: </span>
-                <span className="api-text">{api || 'API Request URL will appear here'}</span>
-            </div>
-            <div className="card-content" onClick={(event) => console.log(event)}>
-                {getCardInstance(sample.businesses)}
+            <Search style={{display: 'block', transition: 'top 0.3s'}} triggerApi={newSearch}/>
+            {data.length ? <h2 style={{cursor: 'pointer'}} onClick={() => setMapView(!mapView)}>Map View</h2> : null}
+            {mapView && renderMap()}
+            <div className="card-content">
+                {getCardInstance(data)}
             </div>
             {isLoadingMore && <Spinner />}
             {shouldLoadMore() ? <a className="loadMore" onClick={loadMore}>Load more...</a> : null}
+            {snackData && <Snackbar text={snackData}/>}
         </div>
     )
 }
-
-//const mapStateToProps = state => ({
-//    anime: state.animeReducer.currentAnime
-//});
-
-//const mapDispatchToProps = dispatch => ({
-//    setNewData: anime => dispatch(addItem(anime)),
-//    appendData: anime => dispatch(appendItem(anime)),
-//    intialiseData: anime => dispatch(intialiseData())
-//})
 
 export default Catalog;

@@ -728,3 +728,117 @@ export const sample = {
 		}
 	}
 }
+
+export const sampleBussines = {
+	"id": "Xg-FyjVKAN70LO4u4Z1ozg",
+	"alias": "hog-island-oyster-co-san-francisco",
+	"name": "Hog Island Oyster Co",
+	"image_url": "https://s3-media3.fl.yelpcdn.com/bphoto/TW9FgV_Ufqd15t_ARQuz1A/o.jpg",
+	"is_claimed": true,
+	"is_closed": false,
+	"url": "https://www.yelp.com/biz/hog-island-oyster-co-san-francisco?adjust_creative=cZq1JtGpsjzoXFQfzrbeJA&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_lookup&utm_source=cZq1JtGpsjzoXFQfzrbeJA",
+	"phone": "+14153917117",
+	"display_phone": "(415) 391-7117",
+	"review_count": 6087,
+	"categories": [{
+		"alias": "seafood",
+		"title": "Seafood"
+	}, {
+		"alias": "seafoodmarkets",
+		"title": "Seafood Markets"
+	}, {
+		"alias": "raw_food",
+		"title": "Live/Raw Food"
+	}],
+	"rating": 4.5,
+	"location": {
+		"address1": "1 Ferry Bldg",
+		"address2": "",
+		"address3": "Shop 11",
+		"city": "San Francisco",
+		"zip_code": "94111",
+		"country": "US",
+		"state": "CA",
+		"display_address": ["1 Ferry Bldg", "Shop 11", "San Francisco, CA 94111"],
+		"cross_streets": ""
+	},
+	"coordinates": {
+		"latitude": 37.795831,
+		"longitude": -122.393303
+	},
+	"photos": ["https://s3-media3.fl.yelpcdn.com/bphoto/TW9FgV_Ufqd15t_ARQuz1A/o.jpg", "https://s3-media1.fl.yelpcdn.com/bphoto/7hxlIEy0kq1k57wOJkW0Og/o.jpg", "https://s3-media1.fl.yelpcdn.com/bphoto/cTDc8ibTvvQESQF3cyICHQ/o.jpg"],
+	"price": "$$",
+	"hours": [{
+		"open": [{
+			"is_overnight": false,
+			"start": "1130",
+			"end": "1700",
+			"day": 0
+		}, {
+			"is_overnight": false,
+			"start": "1130",
+			"end": "1700",
+			"day": 1
+		}, {
+			"is_overnight": false,
+			"start": "1130",
+			"end": "1700",
+			"day": 3
+		}, {
+			"is_overnight": false,
+			"start": "1130",
+			"end": "1800",
+			"day": 4
+		}, {
+			"is_overnight": false,
+			"start": "1100",
+			"end": "1800",
+			"day": 5
+		}, {
+			"is_overnight": false,
+			"start": "1100",
+			"end": "1800",
+			"day": 6
+		}],
+		"hours_type": "REGULAR",
+		"is_open_now": false
+	}],
+	"transactions": [],
+	"special_hours": [{
+		"date": "2020-12-24",
+		"is_closed": null,
+		"start": "1100",
+		"end": "1500",
+		"is_overnight": false
+	}, {
+		"date": "2020-12-25",
+		"is_closed": true,
+		"start": null,
+		"end": null,
+		"is_overnight": null
+	}, {
+		"date": "2021-01-01",
+		"is_closed": true,
+		"start": null,
+		"end": null,
+		"is_overnight": null
+	}, {
+		"date": "2021-11-25",
+		"is_closed": true,
+		"start": null,
+		"end": null,
+		"is_overnight": null
+	}, {
+		"date": "2021-12-24",
+		"is_closed": null,
+		"start": "1100",
+		"end": "1500",
+		"is_overnight": false
+	}, {
+		"date": "2021-12-25",
+		"is_closed": true,
+		"start": null,
+		"end": null,
+		"is_overnight": null
+	}]
+};
