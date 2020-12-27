@@ -1,0 +1,37 @@
+.filters-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  flex-wrap: wrap;
+  background-color: #1B7AC2;
+  color: white;
+}
+
+.filter {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 10px 0px;
+}
+
+.heading {
+  align-self: flex-start;
+  font-weight: bold;
+}
+
+.filter-items {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  flex-wrap: nowrap;
+}
+
+
+.tag-select {
+  padding: 5px;
+  text-align: center;
+  background-color: rgba(255, 255, 255);
+  border-radius: 15px;
+  color: black;
+  margin-left: 5px;
+}

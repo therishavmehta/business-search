@@ -6,7 +6,7 @@ import './styles.css';
  * @param {Object} props - properties which are passed.
  * gets the required item for the card and return the structured node
  */
-function Card({ image_url, alias, url }) {
+function Card({ image_url, alias,name, rating, price,phone, display_phone, url, id }) {
 
     /**
      *
@@ -18,12 +18,15 @@ function Card({ image_url, alias, url }) {
     }
 
     return (
-        <a className="card" onClick={() => openCardInNewTab(url)}>
+        <a id={id}  className="card">
             <div className="card-image">
-                <img src={image_url} alt={alias} />
+                <img id={id} src={image_url} alt={alias} />
             </div>
             <div className="card-name">
-                <h4>{alias}</h4>
+                Name: {name}<br />
+                Rating: {rating}/5<br />
+                Phone: <a href={`tel:${phone}`} target="_blank">{display_phone}</a><br />
+                Price: {price}
             </div>
         </a>
     )

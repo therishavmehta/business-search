@@ -4,11 +4,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 0;
+  padding: 20px 0;
   position: sticky;
   top: 0px;
   background-color: #1B7AC2;
   justify-content: center;
+}
+
+.navbar-hidden {
+  top: -185px;
 }
 
 .search-box input {
@@ -33,10 +37,21 @@
  border-radius: 4px;
  border:1px solid rgba(255,255,255,.4);
  height: 50px;
- width:50px;
+ width:100px;
  box-sizing:border-box;
  color:rgba(255,255,255,.8);
  cursor:pointer
+}
+
+.filter-button {
+  background:rgba(255,255,255,.05);
+  border-radius: 4px;
+  border:1px solid rgba(255,255,255,.4);
+  height: 50px;
+  width:100px;
+  box-sizing:border-box;
+  color:rgba(255,255,255,.8);
+  cursor:pointer
 }
 
 .toggle-button {

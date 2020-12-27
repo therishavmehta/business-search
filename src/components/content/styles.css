@@ -1,0 +1,119 @@
+.leftcolumn {   
+  width: 75%;
+  margin: 10px;
+}
+
+.img {
+  width: 100%;
+  padding: 20px;
+}
+.container-header {
+  width: 100%;
+  padding: 20px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+/* Add a container effect for articles */
+.container {
+  min-width: 300px;
+  padding: 20px 0px;
+  text-align: left;
+  margin-left: 10px;
+}
+
+@media screen and (max-width: 800px) {
+  .leftcolumn, .rightcolumn {   
+    width: 100%;
+    padding: 0;
+  }
+}
+.red-dot {
+  height: 10px;
+  width: 10px;
+  background-color: red;
+  border-radius: 50%;
+  display: inline-block;
+}
+.green-dot {
+  height: 10px;
+  width: 10px;
+  background-color: green;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.container-header {
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+}
+
+.special-hours {
+  max-width: '200px';
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-around;
+  font-size: small;
+  font-weight: lighter;
+  text-align: left !important;
+}
+
+.hours-container {
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+
+.title-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.text {
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.heading-table {
+  display: flex;
+  justify-content: space-around;
+  width: 550px;
+  font-weight: bold;
+}
+
+.timing-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.bussines-photos {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.tag-name {
+  padding: 5px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, .3);
+  border-radius: 15px;
+  color: white;
+  margin-left: 5px;
+}
+
+.rating-container {
+  display: block;
+  margin: 0px;
+  padding: 0px;
+
+
+}
