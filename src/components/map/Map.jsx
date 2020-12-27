@@ -19,7 +19,7 @@ export default class Map extends Component {
       viewport: {
         latitude: 17.44212,
         longitude: 78.391384,
-        zoom: 13,
+        zoom: 10,
         bearing: 0,
         pitch: 0,
         width: "100%",
@@ -31,7 +31,7 @@ export default class Map extends Component {
 
   static getDerivedStateFromProps(props) {
     const {region, coordinates} = props;
-    return {viewport: {...region, zoom: 13,
+    return {viewport: {...region, zoom: 10,
       bearing: 0,
       pitch: 0,
       width: "100%",

@@ -18,87 +18,49 @@ function Catalog(props) {
     
     const [isLoadingMore, setLoadingMore] = useState(false);
     const [api, setApi] = useState('');
-    const [data, setData] = useState([]);
+    const [data, setRenderData] = useState([]);
     const [filters, setFilters] = useState('');
     const [snackData, setSnackData] = useState(false);
     const [markers, setMarkers] = useState([]);
     const [region, setRegion] = useState({});
     const [mapView, setMapView] = useState(false);
 
-    useEffect(() => {
-        api.length && getData();
-    }, [api]);
-
-
-    const filterApi = (param, query) => {
-            const {token} = props;
-            setLoadingMore(() => true);
-            axios.get(`${'https://cors-anywhere.herokuapp.com/'}https://api.yelp.com/v3/businesses/search?${query}`, {
-           headers: {
-            Authorization: `Bearer ${token}`
-            }
-        })
-          .then((res) => {
-            console.log(res.data);
-            setData([...data, res.data.businesses]);
-            const totalPage = res.data.total/queries.limit;
-            setQueries({...queries, totalPage});
-          })
-          .catch((err) => {
-          console.log (err);
-          }).finally(() => {
-              setLoadingMore(() => false);
-          })
-    }
 
     const newSearch = (query) => {
         if(queries.text !== query) {
-            setQueries({text: query, page:1, ...queries});
-            setApi(url+query);
+            setData(query, '', false);
         }
     }
-
-    const applyFilter =(query) => {
-        if(filters !== query) {
-            setQueries({page: 1, ...queries});
-            setFilters(query)
-            setApi(api+query);
-       }
-    }
-
-    const getMarkers = (items) => {
-        let node = [];
-        items.forEach((item) => {
-            node.push(item);
-        });
-        setMarkers([...markers, node]);
-    }
-
     /**
      *
      * @param {Object} queries - get data for the queries.
      */
-    const getData = () => {
-        const {token} = props;
+    const setData = (query, pagination, offset=false) => {
+        const {token, url} = props;
             setLoadingMore(() => true);
-            axios.get(api, {
+            axios.get(url+query+pagination, {
            headers: {
             Authorization: `Bearer ${token}`
             }
         })
           .then((res) => {
-            setData([...data, ...res.data.businesses]);
-            const totalPage = res.data.total/queries.limit;
-            queries.totalPage !== totalPage && setQueries({...queries, totalPage});
-            setMarkers([...markers, ...appendMarkers(res.data.businesses)]);
+            if(offset) {
+                setRenderData([...data, ...res.data.businesses]);
+                setMarkers([...markers, ...appendMarkers(res.data.businesses)]);
+            } else {
+                setRenderData([...res.data.businesses]);
+                setMarkers([...appendMarkers(res.data.businesses)]);
+            }
+            const totalPage = Math.ceil(res.data.total/queries.limit);
+            setQueries({...queries, text: query, page:1, totalPage});
             res.data.region.center && setRegion(res.data.region.center);
           })
           .catch((err) => {
-          console.log (err);
-          setSnackData('Something went wrong!');
+            console.error (err);
+            setSnackData('Something went wrong!');
           }).finally(() => {
               setLoadingMore(() => false);
-              setTimeout(setSnackData(false), 0);
+              setTimeout(setSnackData(false), 5000);
 
           })
     }
@@ -132,18 +94,18 @@ function Catalog(props) {
      * update query with page
      */
     const loadMore = () => {
-        const reg = /offset=[1-9]+/gi;
-        const pageq = `offset=${queries.limit*queries.page}`
-        setQueries(({page=1, ...otherProps}) => ({page: page+1, ...otherProps}));
-        reg.test(api) ? setApi(api.replace(reg, pageq)) : setApi(api+`limit:${queries.limit}&${pageq}`);
-
+        const reg = /&offset=[1-9]+/gi;
+        const pageq = `&offset=${queries.limit*(queries.page+1)}`
+        reg.test(queries.text) ? setData(queries.text, api.replace(reg, pageq), true) : 
+        setData(queries.text, `&limit:${queries.limit}${pageq}`, true);
+        setQueries(({...queries ,page: queries.page+1}));
     }
 
     /**
      * condition for render loading more
      */
     const shouldLoadMore = () => {
-        return queries.totalPage !== queries.page && !isLoadingMore && api.length;
+        return queries.totalPage !== queries.page && !isLoadingMore;
     }
 
     const renderMap = () => {
@@ -163,7 +125,7 @@ function Catalog(props) {
             <div className="card-content">
                 {getCardInstance(data)}
             </div>
-            {isLoadingMore && api.length && <Spinner />}
+            {isLoadingMore && <Spinner />}
             {shouldLoadMore() ? <a className="loadMore" onClick={loadMore}>Load more...</a> : null}
             {snackData && <Snackbar text={snackData}/>}
         </div>

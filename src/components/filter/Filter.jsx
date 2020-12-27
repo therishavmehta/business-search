@@ -27,7 +27,7 @@ function Filter(props) {
   const checkFilter = () => {
     const {price: statePrice, status: stateStatus} = filters;
     let priceValue = ''
-    statePrice.sort().forEach((item='') => priceValue+=`${item.length},`);
+    statePrice.sort().forEach((item='') => priceValue += item.length && `${item.length},`);
     priceValue = priceValue.slice(0, -1);
     let encoded = '';
     if(statePrice.length) encoded +=  `&price=${priceValue}`;

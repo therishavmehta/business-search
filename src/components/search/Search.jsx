@@ -50,7 +50,7 @@ function Search(props) {
 
   const checkLocation = (value) => {
     const reg = '^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$';
-    return reg.test(Number(value));
+    return reg.test(value);
   }
 
 
@@ -58,8 +58,8 @@ function Search(props) {
      * @param {Object} event - event object
      * trigger the new data fetch and update the steps
      */
-    const checkDataAndTrigger = () => {
-      const {bussines, address, latitude, longitude} = inputValue;
+    const checkDataAndTrigger =async (inputValue={}, encodedFilter='') => {
+      const {bussines='', address='', latitude=0, longitude=0} = inputValue;
       let encoded = '', error = 'Please enter the ';
       if(bussines.length) encoded += `term=${bussines}`;
       else error += `bussines`;
@@ -105,10 +105,11 @@ function Search(props) {
     setFilterModal(false);
   }
 
-  const addFilterData = (encoded, filters) => {
-    if(encodedFilter !== encoded && checkDataAndTrigger())  {
-      setEncodedFilter(encoded);
-      setFilterData({...filters});
+  const addFilterData = async (encoded, filters) => {
+    if(encodedFilter !== encoded)  {
+      setEncodedFilter(() => (encoded));
+      setFilterData(() => ({...filters}));
+      await checkDataAndTrigger(inputValue, encoded);
     }
     setFilterModal(false);
   }
@@ -123,7 +124,7 @@ function Search(props) {
               <MyLocationIcon style={{cursor: 'pointer'}} onClick={triggerLocation}/>
         </div>
         <div style={{marginTop: '5px'}}>
-          <button className="search-button" style={{marginLeft: '5px'}} onClick={() => checkDataAndTrigger()}>Go</button>
+          <button className="search-button" style={{marginLeft: '5px'}} onClick={() => checkDataAndTrigger(inputValue, filterData)}>Go</button>
           <button className="filter-button" onClick={() => setFilterModal(true)}>Filter</button>
 
         </div>
@@ -135,7 +136,7 @@ function Search(props) {
         </span>
         {formError && <span style={{color: 'red'}}>{formError}</span>}
         { filterModal && <Modal handleClose={handleModalClose} show={filterModal}>
-          <Filter applyFilter={() => addFilterData()} presentFilter={filterData}/>
+          <Filter applyFilter={addFilterData} presentFilter={filterData}/>
         </Modal>}
         {snackData && <Snackbar text={snackData}/>}
     </div>
