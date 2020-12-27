@@ -12,3 +12,10 @@
   top: 30%;
   padding: 20px;
 }
+
+.modal-close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+}
