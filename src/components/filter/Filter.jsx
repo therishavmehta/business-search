@@ -3,23 +3,37 @@ import {Tag} from '../../components'
 import './styles.css';
 
 function Filter(props) {
-  const { filterVal: {price, status, rating}={} } = props;
+  const { presentFilter: {price, status, rating}={}, applyFilter } = props;
   const [filters, setFilters] = useState({
-    price: price,
-    status: status,
-    rating: rating
+    price: [...price],
+    status: [...status],
   });
 
   const handleFilter = (key, value) => {
-    setFilters({[key]: value, ...filters});
+    const priceIndex = filters.price.indexOf(value);
+    if(key === Filter.Type.PRICE && priceIndex === -1) {
+      setFilters({...filters, [key]: [...filters.price, value]});
+    } else if (filters.price.indexOf(value) > -1) {
+      const sliced  = filters.price.filter(item=>  item != filters.price[priceIndex]);
+      setFilters({...filters, [key]: [...sliced]});
+    }
+    if(key === Filter.Type.STATUS && value !== filters.status[0]) {
+      setFilters({...filters, [key]: [value]});
+    } else if(key === Filter.Type.STATUS && value === filters.status[0]) {
+      setFilters({...filters, [key]: []});
+    }
   }
 
   const checkFilter = () => {
-    const {price: propPrice, status: propStatus, rating: propRating} = props.filterVal;
-    const {price: statePrice, status: stateStatus, rating: stateRating} = filters;
-    if(propPrice !== statePrice || propStatus !== stateStatus || propRating !== stateRating) {
-      //applyFilter(enocode)
-    }
+    const {price: statePrice, status: stateStatus} = filters;
+    let priceValue = ''
+    statePrice.sort().forEach((item='') => priceValue+=`${item.length},`);
+    priceValue = priceValue.slice(0, -1);
+    let encoded = '';
+    if(statePrice.length) encoded +=  `&price=${priceValue}`;
+    if(stateStatus.length) encoded += `&open_now=${stateStatus[0] === 'Closed' ? false : true}`;
+
+    applyFilter(encodeURI(encoded), filters);
   }
 
   return (
@@ -27,30 +41,23 @@ function Filter(props) {
         <div className="filter">
           <div className="heading">Price</div>
           <div onClick={e => handleFilter(Filter.Type.PRICE, e.target.id)} className="filter-items">
-            <Tag id="$">$</Tag>
-            <Tag id="$$">$$</Tag>
-            <Tag id="$$$">$$$</Tag>
-            <Tag id="$$$$">$$$$</Tag>
+            <Tag clickTrigger={true} active={filters.price} id="$">$</Tag>
+            <Tag clickTrigger={true} active={filters.price} id="$$">$$</Tag>
+            <Tag clickTrigger={true} active={filters.price} id="$$$">$$$</Tag>
+            <Tag clickTrigger={true} active={filters.price} id="$$$$">$$$$</Tag>
           </div>
         </div>
         <div className="filter">
           <div className="heading">Status</div>
           <div onClick={e => handleFilter(Filter.Type.STATUS, e.target.id)}  className="filter-items">
-            <Tag id="0">Open</Tag>
-            <Tag id="1">Closed</Tag>
-          </div>
-        </div>
-        <div className="filter">
-          <div className="heading">{`Rating (<=) `}</div>
-          <div onClick={e => handleFilter(Filter.Type.RATING, e.target.id)} className="filter-items">
-            <Tag id="1" active={true}>1</Tag>
-            <Tag id="2">2</Tag>
-            <Tag id="3">3</Tag>
-            <Tag id="4">4</Tag>
-            <Tag id="5">5</Tag>
+            <Tag clickTrigger={true} active={filters.status} id="0">Open</Tag>
+            <Tag clickTrigger={true} active={filters.status} id="1">Closed</Tag>
           </div>
         </div>
         <button className="search-button" onClick={checkFilter} style={{alignSelf: 'flex-end', margin: '5px'}}>Apply</button>
+        <button className="search-button" 
+        onClick={() => applyFilter('', {price: '', status: ''})}
+         style={{alignSelf: 'flex-end', margin: '5px'}}>Clear</button>
       </div>
   )
 }

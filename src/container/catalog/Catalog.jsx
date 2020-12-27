@@ -1,17 +1,14 @@
 import { React, useEffect, useState } from 'react';
-import { Card, Spinner, Search, Map, Snackbar } from '../../components';
+import { Card, Spinner, Search, Map, Snackbar, Modal } from '../../components';
 import {Link} from 'react-router-dom';
-//import { connect } from 'react-redux';
-// import { appendItem, addItem, intialiseData } from '../../redux/anime/anime.actions';
 import './styles.css';
-import { geolocated } from "react-geolocated";
 import axios from 'axios';
 
 /**
  * Prepares the catlog of anime category
  */
 function Catalog(props) {
-    const { url, coords, isGeolocationEnabled, isGeolocationAvailable } = props;
+    const { url } = props;
     const [queries, setQueries] = useState({
         text: '',
         limit: 20,
@@ -22,15 +19,14 @@ function Catalog(props) {
     const [isLoadingMore, setLoadingMore] = useState(false);
     const [api, setApi] = useState('');
     const [data, setData] = useState([]);
-    const [param, setParam] = useState('');
     const [filters, setFilters] = useState('');
     const [snackData, setSnackData] = useState(false);
     const [markers, setMarkers] = useState([]);
     const [region, setRegion] = useState({});
+    const [mapView, setMapView] = useState(false);
 
     useEffect(() => {
         api.length && getData();
-        console.log(coords, isGeolocationAvailable, isGeolocationEnabled);
     }, [api]);
 
 
@@ -94,6 +90,8 @@ function Catalog(props) {
             setData([...data, ...res.data.businesses]);
             const totalPage = res.data.total/queries.limit;
             queries.totalPage !== totalPage && setQueries({...queries, totalPage});
+            setMarkers([...markers, ...appendMarkers(res.data.businesses)]);
+            res.data.region.center && setRegion(res.data.region.center);
           })
           .catch((err) => {
           console.log (err);
@@ -103,26 +101,14 @@ function Catalog(props) {
               setTimeout(setSnackData(false), 0);
 
           })
-            //const notSensitiveText = text.toLowerCase();
-            //const query = `${uri}/search/${topic}?q=${notSensitiveText}&limit=${limit}&page=${page}`;
-            //setApi(() => (`${uri}/search/${topic}?q=${notSensitiveText}`));
-            //const getResponse = await fetch(query);
-            //const response = await getResponse.json();
-            ////prepareFilter(response);
-            //return response;x`
     }
 
-    /**
-     * append cards
-     */
-    const getCards = async () => {
-        //const { results, last_page } = await getData(queries);
-        //if(lastPage !== last_page) {
-        //    setLastPage(last_page);
-        //}
-        //if(results.length) {
-        //    results.length && appendData(results);
-        //}
+    const appendMarkers = (datas) => {
+        let nodes = [];
+        datas.forEach((data) => {
+            data["coordinates"] && nodes.push(data["coordinates"])
+        });
+        return nodes;
     }
 
     /**
@@ -160,11 +146,20 @@ function Catalog(props) {
         return queries.totalPage !== queries.page && !isLoadingMore && api.length;
     }
 
-    const redirectPage = (event) => {};
+    const renderMap = () => {
+        return (
+            <Modal handleClose={() => setMapView(false)} show={mapView}>
+                <Map region={region} coordinates={markers} />
+            </Modal>
+        )
+    }
+
 
     return (
         <div className="catalog-container">
             <Search style={{display: 'block', transition: 'top 0.3s'}} triggerApi={newSearch}/>
+            {data.length ? <h2 style={{cursor: 'pointer'}} onClick={() => setMapView(!mapView)}>Map View</h2> : null}
+            {mapView && renderMap()}
             <div className="card-content">
                 {getCardInstance(data)}
             </div>
@@ -175,59 +170,4 @@ function Catalog(props) {
     )
 }
 
-//const mapStateToProps = state => ({
-//    anime: state.animeReducer.currentAnime
-//});
-
-//const mapDispatchToProps = dispatch => ({
-//    setNewData: anime => dispatch(addItem(anime)),
-//    appendData: anime => dispatch(appendItem(anime)),
-//    intialiseData: anime => dispatch(intialiseData())
-//})
-
-export default geolocated({
-    positionOptions: {
-        enableHighAccuracy: false,
-    },
-    userDecisionTimeout: 5000,
-})(Catalog);
-
-Catalog.filters = ["categories", "price", "is_claimed", "is_closed"]
-
-/** Use for prepared data
- * const prepareFilter = (datas) => {
-        let filterData = new Map();
-        datas.forEach((data, idx) => {
-            Catalog.filters.forEach((item) => {
-                if(data.hasOwnProperty(item)) {
-                    let prevItems, newData;
-                    if(typeof data[item] === 'string') {
-                      prevItems = filterData.get(item) || {};
-                      newData = Object.keys(prevItems).includes(data[item]) ? 
-                                [...prevItems[data[item]], idx] : [idx];
-                      prevItems[data[item]] = newData;
-                      filterData.set(item, prevItems);
-                    } else if(Array.isArray(data[item]) && item === 'categories') {
-                        data[item].forEach((category) => {
-                           const {alias, title} = category;
-                           prevItems = filterData.get(item) || {};
-                           newData = Object.keys(prevItems).includes(title) ?
-                                      [...prevItems[title], idx] : [idx];
-                           prevItems[title] = newData;
-                           filterData.set(item, prevItems); 
-                        })
-                                    
-                    } else if(typeof data[item] === 'boolean') {
-                        prevItems = filterData.get(item) || {};
-                        const values = data[item] ? item.substring(3) : 'Not '+item.substring(3);
-                        newData = Object.keys(prevItems).includes(values) ?
-                                    [...prevItems[values], idx] : [idx];
-                        prevItems[values] = newData;
-                        filterData.set(item, prevItems);
-                    }                                      
-                }
-            });
-        });
-        return filterData;
-    }
- */
+export default Catalog;
