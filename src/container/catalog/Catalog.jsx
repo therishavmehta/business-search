@@ -1,4 +1,4 @@
-import { React, useEffect, useState } from 'react';
+import { React, useState } from 'react';
 import { Card, Spinner, Search, Map, Snackbar, Modal } from '../../components';
 import {Link} from 'react-router-dom';
 import './styles.css';
@@ -8,21 +8,14 @@ import axios from 'axios';
  * Prepares the catlog of anime category
  */
 function Catalog(props) {
-    const { url } = props;
-    const [queries, setQueries] = useState({
-        text: '',
-        limit: 20,
-        totalPage: 1,
-        page: 1
-    });
+    const { url, token,
+            data=[], setRenderData,
+            markers, setMarkers,
+            region, setRegion,
+            queries, setQueries,
+            isLoadingMore, setLoadingMore } = props;
     
-    const [isLoadingMore, setLoadingMore] = useState(false);
-    const [api, setApi] = useState('');
-    const [data, setRenderData] = useState([]);
-    const [filters, setFilters] = useState('');
     const [snackData, setSnackData] = useState(false);
-    const [markers, setMarkers] = useState([]);
-    const [region, setRegion] = useState({});
     const [mapView, setMapView] = useState(false);
 
 
@@ -36,7 +29,6 @@ function Catalog(props) {
      * @param {Object} queries - get data for the queries.
      */
     const setData = (query, pagination, offset=false) => {
-        const {token, url} = props;
             setLoadingMore(() => true);
             axios.get(url+query+pagination, {
            headers: {
@@ -87,6 +79,7 @@ function Catalog(props) {
             <Card id={id} key={id} {...otherProps}/>
             </Link>);
         });
+
         return cards;
     }
 
@@ -96,7 +89,7 @@ function Catalog(props) {
     const loadMore = () => {
         const reg = /&offset=[1-9]+/gi;
         const pageq = `&offset=${queries.limit*(queries.page+1)}`
-        reg.test(queries.text) ? setData(queries.text, api.replace(reg, pageq), true) : 
+        reg.test(queries.text) ? setData(queries.text, queries.text.replace(reg, pageq), true) : 
         setData(queries.text, `&limit:${queries.limit}${pageq}`, true);
         setQueries(({...queries ,page: queries.page+1}));
     }

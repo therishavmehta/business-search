@@ -5,7 +5,7 @@ import MyLocationIcon from '@material-ui/icons/MyLocation';
 import './styles.css';
 
 function Search(props) {
-  const {triggerApi, coords, isGeolocationAvailable, isGeolocationEnabled, classView} = props;
+  const {triggerApi, coords, isGeolocationAvailable, isGeolocationEnabled } = props;
   const [inputValue, setInputValue] = useState({
     bussines: '',
     address: '',
@@ -17,21 +17,10 @@ function Search(props) {
   const [filterModal, setFilterModal] = useState(false);
   const [snackData, setSnackData] = useState(false);
   const [filterData, setFilterData] = useState({
-    price: '',
-    status: '',
+    price: [],
+    status: [],
   });
   const [encodedFilter, setEncodedFilter] = useState('');
-
-  /**
-     *
-     * @param {Object} event - event object
-     * trigger data fetch when enter is captured in input
-     */
-    const triggerEvent = (event) => {
-      //if (event.key === 'Enter') {
-      //    getNewData(event);
-      //}
-  }
 
   const triggerLocation = () => {
     if(!isGeolocationEnabled) {
@@ -47,11 +36,6 @@ function Search(props) {
     }
     setTimeout(setSnackData(false), 5000); 
 }
-
-  const checkLocation = (value) => {
-    const reg = '^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$';
-    return reg.test(value);
-  }
 
 
     /**

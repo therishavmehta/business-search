@@ -118,7 +118,7 @@ function Content(props) {
               {bussinesPhotos(photos)}
             </div>
           <div className="timing-container">
-            <div class="hours-container">
+            <div className="hours-container">
                 <h2>Timing</h2>
                     <div className="heading-table">
                       <span>Day</span>
@@ -128,7 +128,7 @@ function Content(props) {
                     </div>
                     {timing(hours)}
                   </div>
-              <div class="hours-container">
+              <div className="hours-container">
                 <h2>Special Hours</h2>
                     <div className="heading-table">
                       <span>Date</span>

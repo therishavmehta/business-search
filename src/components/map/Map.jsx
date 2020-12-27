@@ -1,5 +1,5 @@
-import React, { Component, useEffect, useState } from "react";
-import MapGL, { NavigationControl, Marker, Popup } from "react-map-gl";
+import React, { Component } from "react";
+import MapGL, { NavigationControl, Marker } from "react-map-gl";
 import RoomIcon from '@material-ui/icons/Room';
 
 
