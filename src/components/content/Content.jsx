@@ -7,16 +7,9 @@ import axios from 'axios';
 import {withRouter} from 'react-router';
 import {Icon} from 'semantic-ui-react'
 function Content(props) {
-    const { token='', match:{params: {busid}={}}={}, mapToken=''} = props;
+    const { token='', match:{params: {busid}={}}={} } = props;
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true);
-    const [mapViewPort, setMapViewPort] = useState({
-      latitude: 25.0960742,
-      longitude: 85.31311939999999,
-      heigth: '100vh',
-      width: '100vw',
-      zoom: 10
-    })
     const openNewTab = (link) => {
       window.open(link, '_blank');
     }

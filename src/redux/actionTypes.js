@@ -1,0 +1,18 @@
+
+export const searchAction = {
+  ADD_QUERY: 'ADD_QUERY',
+  APPEND_QUERY: 'APPEND_QUERY',
+  REMOVE_QUERY: 'REMOVE_QUERY',
+}
+
+export const filterAction = {
+  ADD_FITLER: 'ADD_FILTER',
+  APPEND_FITLER: 'APPEND_FILTER',
+  REMOVE_FITLER: 'REMOVE_FILTER'
+}
+
+export const dataAction = {
+  ADD_DATA: 'ADD_DATA',
+  APPEND_DATA: 'APPEND_DATA',
+  REMOVE_DATA: 'REMOVE_DATA'
+}
